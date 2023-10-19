@@ -19,4 +19,4 @@ Therefore, you can think of onyx as a more robust, secure digital drive for your
 
 ## Authentication
 
-Because each onyx node operates independently, there is no central authentication service, but instead each node maintains a set of users, and issues short-lived tokens granting users access to secure resources. When a user needs to access resources from a networked onyx node, their home node will send the user's id and the home node's own thing.
+Because each onyx node operates independently, there is no central authentication service, but instead each node maintains a set of users, and issues short-lived tokens granting users access to secure resources. When a user needs to access resources from a networked onyx node, they'll use their own token, which the networked node will independently verify was issued recently by the user's home node.
