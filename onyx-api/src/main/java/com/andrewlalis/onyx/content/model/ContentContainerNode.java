@@ -1,6 +1,8 @@
-package com.andrewlalis.onyx.content;
+package com.andrewlalis.onyx.content.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
@@ -9,11 +11,16 @@ import java.util.Set;
  * themselves be any type of content node.
  */
 @Entity
-@Table(name = "content_node_container")
+@Table(name = "onyx_content_container_node")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class ContentContainerNode extends ContentNode {
     /**
      * The set of children that belong to this container.
      */
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "parentContainer")
     private Set<ContentNode> children;
+
+    public ContentContainerNode(String name, ContentContainerNode parentContainer) {
+        super(name, Type.CONTAINER, parentContainer);
+    }
 }

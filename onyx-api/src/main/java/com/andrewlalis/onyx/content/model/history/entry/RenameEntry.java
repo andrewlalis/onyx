@@ -1,8 +1,8 @@
-package com.andrewlalis.onyx.content.history.entry;
+package com.andrewlalis.onyx.content.model.history.entry;
 
-import com.andrewlalis.onyx.content.ContentNode;
-import com.andrewlalis.onyx.content.history.ContentNodeHistory;
-import com.andrewlalis.onyx.content.history.ContentNodeHistoryEntry;
+import com.andrewlalis.onyx.content.model.ContentNode;
+import com.andrewlalis.onyx.content.model.history.ContentNodeHistory;
+import com.andrewlalis.onyx.content.model.history.ContentNodeHistoryEntry;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "content_node_history_entry_rename")
+@Table(name = "onyx_content_node_history_entry__rename")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RenameEntry extends ContentNodeHistoryEntry {

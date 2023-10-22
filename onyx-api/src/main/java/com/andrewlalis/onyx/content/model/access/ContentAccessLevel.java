@@ -1,4 +1,4 @@
-package com.andrewlalis.onyx.content;
+package com.andrewlalis.onyx.content.model.access;
 
 /**
  * The different levels of access that can be set for content in an onyx node.

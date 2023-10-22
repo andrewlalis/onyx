@@ -1,8 +1,10 @@
-package com.andrewlalis.onyx.content;
+package com.andrewlalis.onyx.content.model;
 
-import com.andrewlalis.onyx.content.history.ContentNodeHistory;
+import com.andrewlalis.onyx.content.model.access.ContentAccessRules;
+import com.andrewlalis.onyx.content.model.history.ContentNodeHistory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -10,11 +12,13 @@ import lombok.NoArgsConstructor;
  * content tree, including both <em>containers</em> and <em>documents</em>.
  */
 @Entity
-@Table(name = "content_node")
+@Table(name = "onyx_content_node")
 @Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public abstract class ContentNode {
     public static final int MAX_NAME_LENGTH = 127;
+    public static final String ROOT_NODE_NAME = "___ROOT___";
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -23,7 +27,7 @@ public abstract class ContentNode {
     private String name;
 
     @Enumerated(EnumType.ORDINAL) @Column(columnDefinition = "TINYINT NOT NULL")
-    private Type type;
+    private Type nodeType;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false, orphanRemoval = true, cascade = CascadeType.ALL)
     private ContentAccessRules accessInfo;
@@ -49,7 +53,8 @@ public abstract class ContentNode {
 
     public ContentNode(String name, Type type, ContentContainerNode parentContainer) {
         this.name = name;
-        this.type = type;
+        this.nodeType = type;
+        this.accessInfo = new ContentAccessRules();
         this.parentContainer = parentContainer;
         this.history = new ContentNodeHistory(this);
     }

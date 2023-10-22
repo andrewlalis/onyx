@@ -34,3 +34,6 @@ build/
 
 *.mv.db
 *.db
+
+*.der
+*.pem

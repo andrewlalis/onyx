@@ -1,8 +1,9 @@
-package com.andrewlalis.onyx.content.history;
+package com.andrewlalis.onyx.content.model.history;
 
-import com.andrewlalis.onyx.content.ContentNode;
+import com.andrewlalis.onyx.content.model.ContentNode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,8 +16,9 @@ import java.util.Set;
  * storing an ordered list of entries detailing how that node has changed.
  */
 @Entity
-@Table(name = "content_node_history")
+@Table(name = "onyx_content_node_history")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class ContentNodeHistory {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

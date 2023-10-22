@@ -1,4 +1,4 @@
-package com.andrewlalis.onyx.content.history;
+package com.andrewlalis.onyx.content.model.history;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * some basic properties that all entries should have.
  */
 @Entity
-@Table(name = "content_node_history_entry")
+@Table(name = "onyx_content_node_history_entry")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -1,8 +1,8 @@
-package com.andrewlalis.onyx.content.history.entry;
+package com.andrewlalis.onyx.content.model.history.entry;
 
-import com.andrewlalis.onyx.content.ContentAccessLevel;
-import com.andrewlalis.onyx.content.history.ContentNodeHistory;
-import com.andrewlalis.onyx.content.history.ContentNodeHistoryEntry;
+import com.andrewlalis.onyx.content.model.access.ContentAccessLevel;
+import com.andrewlalis.onyx.content.model.history.ContentNodeHistory;
+import com.andrewlalis.onyx.content.model.history.ContentNodeHistoryEntry;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
  * by a user or the system.
  */
 @Entity
-@Table(name = "content_node_history_entry_access_rules")
+@Table(name = "onyx_content_node_history_entry__access_rules")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AccessRulesEntry extends ContentNodeHistoryEntry {
