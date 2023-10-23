@@ -40,7 +40,7 @@ public class TokenService {
     private static final String ISSUER = "Onyx API";
 
     private PrivateKey signingKey;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+    private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 

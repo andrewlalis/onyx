@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -40,5 +41,5 @@ public class ContentAccessRules {
      * User-specific access rules that override other more generic rules, if present.
      */
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "contentAccessRules")
-    private Set<UserContentAccessRule> userAccessRules;
+    private Set<UserContentAccessRule> userAccessRules = new HashSet<>();
 }
