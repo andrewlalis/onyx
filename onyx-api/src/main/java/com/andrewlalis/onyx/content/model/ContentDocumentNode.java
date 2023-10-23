@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "onyx_content_document_node")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class ContentDocumentNode extends ContentNode {
     @Column(nullable = false, updatable = false, length = 127)
     private String contentType;

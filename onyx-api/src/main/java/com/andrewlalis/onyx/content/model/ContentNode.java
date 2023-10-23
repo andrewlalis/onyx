@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * The abstract model that represents all nodes in the system's hierarchical
@@ -43,7 +44,7 @@ public abstract class ContentNode {
     @OneToOne(fetch = FetchType.LAZY, optional = false, orphanRemoval = true, cascade = CascadeType.ALL)
     private ContentNodeHistory history;
 
-    @Column(nullable = false)
+    @Column(nullable = false) @Setter
     private boolean archived;
 
     public enum Type {
