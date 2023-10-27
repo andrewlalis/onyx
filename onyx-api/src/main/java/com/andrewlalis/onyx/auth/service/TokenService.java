@@ -1,5 +1,6 @@
 package com.andrewlalis.onyx.auth.service;
 
+import com.andrewlalis.onyx.auth.api.AccessTokenResponse;
 import com.andrewlalis.onyx.auth.api.LoginRequest;
 import com.andrewlalis.onyx.auth.api.TokenPair;
 import com.andrewlalis.onyx.auth.model.RefreshToken;
@@ -14,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 
@@ -38,6 +39,8 @@ import java.util.Optional;
 public class TokenService {
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String ISSUER = "Onyx API";
+    private static final int REFRESH_TOKEN_EXPIRATION_DAYS = 30;
+    private static final int ACCESS_TOKEN_EXPIRATION_MINUTES = 120;
 
     private PrivateKey signingKey;
     private final PasswordEncoder passwordEncoder;
@@ -54,14 +57,16 @@ public class TokenService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials.");
         }
         User user = optionalUser.get();
-        String refreshToken = generateRefreshToken(user);
-        String accessToken = generateAccessToken(refreshToken);
-        return new TokenPair(refreshToken, accessToken);
+        final Instant now = OffsetDateTime.now(ZoneOffset.UTC).toInstant();
+        Instant refreshTokenExpiration = now.plus(REFRESH_TOKEN_EXPIRATION_DAYS, ChronoUnit.DAYS);
+        String refreshToken = generateRefreshToken(user, refreshTokenExpiration);
+        Instant accessTokenExpiration = now.plus(ACCESS_TOKEN_EXPIRATION_MINUTES, ChronoUnit.MINUTES);
+        String accessToken = generateAccessToken(refreshToken, accessTokenExpiration);
+        return new TokenPair(refreshToken, refreshTokenExpiration.toEpochMilli(), accessToken, accessTokenExpiration.toEpochMilli());
     }
 
     @Transactional
-    public String generateRefreshToken(User user) {
-        Instant expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusDays(7).toInstant();
+    public String generateRefreshToken(User user, Instant expiresAt) {
         try {
             String token = Jwts.builder()
                     .setSubject(Long.toString(user.getId()))
@@ -86,7 +91,7 @@ public class TokenService {
     }
 
     @Transactional(readOnly = true)
-    public String generateAccessToken(String refreshTokenString) {
+    public String generateAccessToken(String refreshTokenString, Instant expiresAt) {
         String suffix = refreshTokenString.substring(refreshTokenString.length() - RefreshToken.SUFFIX_LENGTH);
         RefreshToken refreshToken = null;
         for (RefreshToken possibleToken : refreshTokenRepository.findAllByTokenSuffix(suffix)) {
@@ -101,7 +106,6 @@ public class TokenService {
         if (refreshToken.getExpiresAt().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is expired.");
         }
-        Instant expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusHours(1).toInstant();
         try {
             return Jwts.builder()
                     .setSubject(Long.toString(refreshToken.getUser().getId()))
@@ -119,17 +123,31 @@ public class TokenService {
     }
 
     @Transactional(readOnly = true)
-    public String generateAccessToken(HttpServletRequest request) {
+    public AccessTokenResponse generateAccessToken(HttpServletRequest request) {
         String refreshTokenString = extractBearerToken(request);
         if (refreshTokenString == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing refresh token.");
         }
-        return generateAccessToken(refreshTokenString);
+        Instant expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(ACCESS_TOKEN_EXPIRATION_MINUTES).toInstant();
+        return new AccessTokenResponse(
+                generateAccessToken(refreshTokenString, expiresAt),
+                expiresAt.toEpochMilli()
+        );
     }
 
     @Transactional
     public void removeAllRefreshTokens(User user) {
         refreshTokenRepository.deleteAllByUserId(user.getId());
+    }
+
+    public long getTokenExpiration(HttpServletRequest request) {
+        try {
+            Jws<Claims> jws = getToken(request);
+            return jws.getBody().getExpiration().getTime();
+        } catch (Exception e) {
+            log.warn("Exception occurred while getting token expiration.", e);
+            return -1;
+        }
     }
 
     public Jws<Claims> getToken(HttpServletRequest request) throws Exception {

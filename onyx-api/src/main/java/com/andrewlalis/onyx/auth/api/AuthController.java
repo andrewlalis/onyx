@@ -20,12 +20,17 @@ public class AuthController {
     }
 
     @GetMapping("/auth/access")
-    public Object getAccessToken(HttpServletRequest request) {
-        return Map.of("accessToken", tokenService.generateAccessToken(request));
+    public AccessTokenResponse getAccessToken(HttpServletRequest request) {
+        return tokenService.generateAccessToken(request);
     }
 
     @DeleteMapping("/auth/refresh-tokens")
     public void removeAllRefreshTokens(@AuthenticationPrincipal User user) {
         tokenService.removeAllRefreshTokens(user);
+    }
+
+    @GetMapping("/auth/token-expiration")
+    public Object getTokenExpiration(HttpServletRequest request) {
+        return Map.of("expiresAt", tokenService.getTokenExpiration(request));
     }
 }

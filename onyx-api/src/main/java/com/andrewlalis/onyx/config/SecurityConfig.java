@@ -27,6 +27,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(registry -> {
             registry.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/auth/login")).permitAll();
             registry.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/auth/access")).permitAll();
+            registry.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/auth/token-expiration")).permitAll();
             registry.anyRequest().authenticated();
         });
         http.csrf(AbstractHttpConfigurer::disable);
