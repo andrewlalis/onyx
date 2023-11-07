@@ -142,7 +142,7 @@ public class TokenService {
 
     public long getTokenExpiration(HttpServletRequest request) {
         try {
-            Jws<Claims> jws = getToken(request);
+            Jws<Claims> jws = parseToken(extractBearerToken(request));
             return jws.getBody().getExpiration().getTime();
         } catch (Exception e) {
             log.warn("Exception occurred while getting token expiration.", e);
@@ -150,16 +150,15 @@ public class TokenService {
         }
     }
 
-    public Jws<Claims> getToken(HttpServletRequest request) throws Exception {
-        String rawToken = extractBearerToken(request);
-        if (rawToken == null) return null;
+    public Jws<Claims> parseToken(String token) throws Exception {
+        if (token == null) return null;
         JwtParserBuilder parserBuilder = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .requireIssuer(ISSUER);
-        return parserBuilder.build().parseClaimsJws(rawToken);
+        return parserBuilder.build().parseClaimsJws(token);
     }
 
-    private String extractBearerToken(HttpServletRequest request) {
+    public String extractBearerToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) return null;
         String rawToken = authorizationHeader.substring(BEARER_PREFIX.length());

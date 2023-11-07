@@ -3,6 +3,7 @@ package com.andrewlalis.onyx.auth.components;
 import com.andrewlalis.onyx.auth.model.User;
 import com.andrewlalis.onyx.content.dao.ContentNodeRepository;
 import com.andrewlalis.onyx.content.model.ContentNode;
+import com.andrewlalis.onyx.content.service.ContentAccessService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ import java.io.IOException;
 @Slf4j
 public class ContentAccessFilter extends OncePerRequestFilter {
     private final ContentNodeRepository contentNodeRepository;
+    private final ContentAccessService contentAccessService;
 
     @Override
     protected void doFilterInternal(
@@ -48,8 +50,6 @@ public class ContentAccessFilter extends OncePerRequestFilter {
             log.warn("Node doesn't exist!");
             return;
         }
-        TokenAuthentication auth = (TokenAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        User user = auth.getPrincipal();
         // TODO: Actually check access rules.
         filterChain.doFilter(request, response);
     }

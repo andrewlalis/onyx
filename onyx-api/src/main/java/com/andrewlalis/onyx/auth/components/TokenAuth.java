@@ -1,8 +1,5 @@
 package com.andrewlalis.onyx.auth.components;
 
-import com.andrewlalis.onyx.auth.model.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -10,12 +7,16 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * The authentication implementation that's used when a user logs in with an
- * access token.
- * @param user The user that the token belongs to.
- * @param jws The raw token.
+ * An abstract base class for any authentication instance based on the use of
+ * a JWT for authentication.
  */
-public record TokenAuthentication(User user, Jws<Claims> jws) implements Authentication {
+public abstract class TokenAuth implements Authentication {
+    public final String token;
+
+    protected TokenAuth(String token) {
+        this.token = token;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
@@ -23,17 +24,12 @@ public record TokenAuthentication(User user, Jws<Claims> jws) implements Authent
 
     @Override
     public Object getCredentials() {
-        return this.jws;
+        return this.token;
     }
 
     @Override
     public Object getDetails() {
         return null;
-    }
-
-    @Override
-    public User getPrincipal() {
-        return this.user;
     }
 
     @Override
@@ -44,10 +40,5 @@ public record TokenAuthentication(User user, Jws<Claims> jws) implements Authent
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
         throw new RuntimeException("Cannot set the authenticated status of TokenAuthentication.");
-    }
-
-    @Override
-    public String getName() {
-        return user.getUsername();
     }
 }
